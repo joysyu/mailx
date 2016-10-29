@@ -86,6 +86,23 @@ class MuteTag(models.Model):
 	class Meta:
 		unique_together = ("user", "tag")
 
+class FollowUserGroup(models.Model):
+	id = models.AutoField(primary_key=True)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL)
+	group = models.ForeignKey('Group')
+	following = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='following_user')
+	timestamp = models.DateTimeField(auto_now=True)
+	def __unicode__(self):
+		return '%s follows member %s in group %s' % (self.user.email, self.following.email, self.group.name)
+
+class MuteUserGroup(models.Model):
+	id = models.AutoField(primary_key=True)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL)
+	group = models.ForeignKey('Group')
+	muting = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='muting_user')
+	timestamp = models.DateTimeField(auto_now=True)
+	def __unicode__(self):
+		return '%s mutes member %s in group %s' % (self.user.email, self.following.email, self.group.name)
 
 class MemberGroup(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -104,7 +121,7 @@ class MemberGroup(models.Model):
 	class Meta:
 		db_table = "murmur_membergroups"
 		unique_together = ("member", "group")
-	
+
 
 class Group(models.Model):
 	id = models.AutoField(primary_key=True)
