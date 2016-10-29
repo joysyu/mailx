@@ -61,7 +61,8 @@ def group_info_page(user, group_name):
 					res['admin'] = membergroup.admin
 					res['moderator'] = membergroup.moderator
 					res['subscribed'] = True
-			
+					res['following'] = membergroup.always_follow_thread
+					res['no_emails'] = membergroup.no_emails
 
 			member_info = {'id':membergroup.id,
 							'email': membergroup.member.email,
@@ -70,6 +71,7 @@ def group_info_page(user, group_name):
 						   'mod': membergroup.moderator}
 			
 			res['members'].append(member_info)
+
 	except:
 		res['group'] = None
 	
@@ -715,12 +717,16 @@ def _create_post(group, subject, message_text, user):
 	recipients = []
 	for m in group_members:
 		if not m.no_emails and m.member.email != user.email:
+			# If any recipient has the tag muted or has the sender muted, he/she will not receive the email.
 			mute_tag = MuteTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			if not mute_tag:
+			mute_user = MuteUserGroup.objects.filter(user = m.member, group = group , muting = user).exists()
+			if not mute_tag and not mute_user:
 				recipients.append(m.member.email)
 		else:
+			# If any recipient is following the tag or the user, he/she will receive the email.
 			follow_tag = FollowTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			if follow_tag:
+			follow_user = FollowUserGroup.objects.filter(user = m.member, group = group, following = user).exists()
+			if follow_tag or follow_user:
 				recipients.append(m.member.email)
 				
 	recipients.append(user.email)
@@ -1114,8 +1120,6 @@ def follow_tag(tag_name, group_name, user=None, email=None):
 	logging.debug(res)
 	return res
 
-
-
 def unfollow_tag(tag_name, group_name, user=None, email=None):
 	res = {'status':False}
 	g = Group.objects.get(name=group_name)
@@ -1138,7 +1142,6 @@ def unfollow_tag(tag_name, group_name, user=None, email=None):
 		res['code'] = msg_code['UNKNOWN_ERROR']
 	logging.debug(res)
 	return res
-
 
 def mute_tag(tag_name, group_name, user=None, email=None):
 	res = {'status':False}
@@ -1164,7 +1167,6 @@ def mute_tag(tag_name, group_name, user=None, email=None):
 	return res
 
 
-
 def unmute_tag(tag_name, group_name, user=None, email=None):
 	res = {'status':False}
 	g = Group.objects.get(name=group_name)
@@ -1187,3 +1189,128 @@ def unmute_tag(tag_name, group_name, user=None, email=None):
 		res['code'] = msg_code['UNKNOWN_ERROR']
 	logging.debug(res)
 	return res
+
+# following_emails is a string of membergroup IDs
+def follow_user(following_emails, group_name, user=None, email=None):
+	res = {'status': False}
+	group = Group.objects.get(name=group_name)
+	following_user = None
+	try:
+		if email:
+			user = UserProfile.objects.get(email=email)
+	
+		# Get the following_email form following_emails' IDs
+		membergroups = MemberGroup.objects.filter(group=group).select_related()
+		following_emails = following_emails.split(",")
+		following_emails = [int(memberGroupID) for memberGroupID in following_emails if memberGroupID != '']
+		for membergroup in membergroups:
+			if membergroup.id in following_emails:
+				following_email = membergroup.member.email
+				following_user = UserProfile.objects.get(email=following_email)
+				try: 
+					userGroup_follow = FollowUserGroup.objects.get(user = user, group = group, following = following_user)
+				except FollowUserGroup.DoesNotExist:
+					f = FollowUserGroup(user = user, group = group, following = following_user)
+					f.save()	
+		res['status'] = True
+
+	except UserProfile.DoesNotExist:
+		res['code'] = msg_code['USER_NOT_FOUND_ERROR']
+	except:
+		res['code'] = msg_code['UNKNOWN_ERROR']
+	return res
+
+def unfollow_user(unfollowing_emails, group_name, user=None, email=None):
+	res = {'status': False}
+	group = Group.objects.get(name=group_name)
+	unfollowing_user = None
+
+	try:
+		if email:
+			user = UserProfile.objects.get(email=email)
+
+		membergroups = MemberGroup.objects.filter(group=group).select_related()
+		unfollowing_emails = unfollowing_emails.split(",")
+		unfollowing_emails = [int(memberGroupID) for memberGroupID in unfollowing_emails if memberGroupID != '']
+		print unfollowing_emails
+		for membergroup in membergroups:
+			if membergroup.id in unfollowing_emails:
+				unfollowing_email = membergroup.member.email
+				unfollowing_user = UserProfile.objects.get(email=unfollowing_email)
+				try: 
+					userGroup_unfollow = FollowUserGroup.objects.get(user = user, group = group, following = unfollowing_user)
+					userGroup_unfollow.delete()
+				except FollowUserGroup.DoesNotExist:#nothing to delete? unfollow unsuccessful?
+					print "i dont know what to do here lol"
+		res['status'] = True
+
+	except UserProfile.DoesNotExist:
+		res['code'] = msg_code['USER_NOT_FOUND_ERROR']
+	except:
+		res['code'] = msg_code['UNKNOWN_ERROR']
+	return res
+
+def mute_user(muting_emails, group_name, user=None, email=None):
+	print "im in main.py mute user!!"
+	res = {'status': False}
+	group = Group.objects.get(name=group_name)
+	muting_user = None
+	try:
+		if email:
+			user = UserProfile.objects.get(email=email)
+	
+		# Get the following_email form following_emails' IDs
+		membergroups = MemberGroup.objects.filter(group=group).select_related()
+		muting_emails = muting_emails.split(",")
+		muting_emails = [int(memberGroupID) for memberGroupID in muting_emails if memberGroupID != '']
+		print "muting emails are"
+		print muting_emails
+		for membergroup in membergroups:
+			if membergroup.id in muting_emails:
+				muting_email = membergroup.member.email
+				muting_user = UserProfile.objects.get(email=muting_email)
+				print "muting user is"
+				print muting_user
+				try: 
+					userGroup_mute = MuteUserGroup.objects.get(user = user, group = group, muting = muting_user)
+				except MuteUserGroup.DoesNotExist:
+					print "Im in this exception"
+					userGroup_mute = MuteUserGroup(user = user, group = group, muting = muting_user)
+					userGroup_mute.save()	
+		res['status'] = True
+
+	except UserProfile.DoesNotExist:
+		res['code'] = msg_code['USER_NOT_FOUND_ERROR']
+	except:
+		res['code'] = msg_code['UNKNOWN_ERROR']
+	return res
+
+def unmute_user(unmuting_emails, group_name, user=None, email=None):
+	res = {'status': False}
+	group = Group.objects.get(name=group_name)
+	unmuting_user = None
+
+	try:
+		if email:
+			user = UserProfile.objects.get(email=email)
+
+		membergroups = MemberGroup.objects.filter(group=group).select_related()
+		unmuting_emails = unmuting_emails.split(",")
+		unmuting_emails = [int(memberGroupID) for memberGroupID in unmuting_emails if memberGroupID != '']
+		for membergroup in membergroups:
+			if membergroup.id in unmuting_emails:
+				unmuting_email = membergroup.member.email
+				unmuting_user = UserProfile.objects.get(email=unmuting_email)
+				try: 
+					userGroup_unmute = MuteUserGroup.objects.get(user = user, group = group, muting = unmuting_user)
+					userGroup_unmute.delete()
+				except MuteUserGroup.DoesNotExist:#nothing to delete? unmute unsuccessful?
+					print "i dont know what to do here lol"
+		res['status'] = True
+
+	except UserProfile.DoesNotExist:
+		res['code'] = msg_code['USER_NOT_FOUND_ERROR']
+	except:
+		res['code'] = msg_code['UNKNOWN_ERROR']
+	return res
+

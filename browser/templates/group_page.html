@@ -104,10 +104,18 @@
 				<button type="button" id="btn-add-members" style="display: none;">Add Members</button>
 			{% endif %}
 			
+			{% if group_info.following and not group_info.no_emails %}
+				<button type="button" id="btn-mute-member">Mute Member</button>
+				<button type="button" id="btn-unmute-member">Unmute Member</button>
+			{% else %}
+				<button type="button" id="btn-follow-member">Follow Member</button>
+				<button type="button" id="btn-unfollow-member">Unfollow Member</button>
+			{% endif %}
+
 			<table id="members-table" class="display" cellspacing="0" width="100%">
 				<thead>
 					<tr>
-						{% if group_info.admin %}
+					{% if group_info.admin %}
 						<th>Select</th>
 						<th>Email</th>
 						{% if flavour != "mobile" %}
@@ -123,12 +131,17 @@
 							<th>Moderator</th>
 						{% endif %}
 					{% endif %}
+					{% if group_info.following and not group_info.no_emails %}
+						<th>Muted</th>
+				    {% else %}
+				    	<th>Following</th>
+					{% endif %}
 					</tr>
 				</thead>
 				
 				<tfoot>
 					<tr>
-						{% if group_info.admin %}
+					{% if group_info.admin %}
 						<th>Select</th>
 						<th>Email</th>
 						{% if flavour != "mobile" %}
@@ -143,6 +156,11 @@
 							<th>Admin</th>
 							<th>Moderator</th>
 						{% endif %}
+					{% endif %}
+					{% if group_info.following and not group_info.no_emails %}
+						<th>Muted</th>
+				    {% else %}
+				    	<th>Following</th>
 					{% endif %}
 					</tr>
 				</tfoot>
@@ -172,6 +190,22 @@
 							<th></th>
 							{% endif %}
 						{% endif %}
+
+						{% if group_info.following and not group_info.no_emails %}
+							{% if member.muted %}
+								<th><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></th>
+							{% else %}
+								<th></th>
+							{% endif %}
+
+				    	{% else %}
+				    		{% if member.followed %}
+								<th><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></th>
+							{% else %}
+								<th></th>
+							{% endif %}
+						{% endif %}
+
 					</tr>
 						{% else %}
 						<td>{{ member.email }}</td>
@@ -188,6 +222,22 @@
 							<th></th>
 							{% endif %}
 						{% endif %}
+
+						{% if group_info.following and not group_info.no_emails %}
+							{% if member.muted %}
+								<th><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></th>
+							{% else %}
+								<th></th>
+							{% endif %}
+
+				    	{% else %}
+				    		{% if member.followed %}
+								<th><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></th>
+							{% else %}
+								<th></th>
+							{% endif %}
+						{% endif %}
+						
 					</tr>
 						{% endif %}
 					{% endfor %}

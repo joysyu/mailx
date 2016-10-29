@@ -49,6 +49,12 @@ urlpatterns = patterns('',
      url(r'^upvote', 'browser.views.upvote'),
      url(r'^unupvote', 'browser.views.unupvote'),
      
+     url(r'^follow_member', 'browser.views.follow_member'),
+     url(r'^unfollow_member', 'browser.views.unfollow_member'),
+
+     url(r'^mute_member', 'browser.views.mute_member'),
+     url(r'^unmute_member', 'browser.views.unmute_member'),
+
      url(r'^follow_tag_get', 'browser.views.follow_tag_get'),
      url(r'^unfollow_tag_get', 'browser.views.unfollow_tag_get'),
      
@@ -76,7 +82,6 @@ urlpatterns = patterns('',
      url(r'^unsubscribe_get', 'browser.views.unsubscribe_get'),
      url(r'^subscribe_get', 'browser.views.subscribe_get'),
 
-     
     #override the registration default urls - bug with django 1.6
       url(r'^password/change/$',
                     murmur_acct,

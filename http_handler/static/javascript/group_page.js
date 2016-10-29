@@ -16,6 +16,7 @@ $(document).ready(function(){
 				null,
 				null,
 				null,
+				null,
 				null
 			]
 		});
@@ -34,6 +35,11 @@ $(document).ready(function(){
 	var btn_set_admin = $("#btn-set-admin");
 	var btn_set_mod = $("#btn-set-mod");
 	var btn_delete_group = $("#btn-delete-group");
+
+	var btn_mute_member = $("#btn-mute-member");
+	var btn_unmute_member = $("#btn-unmute-member");
+	var btn_follow_member = $("#btn-follow-member");
+	var btn_unfollow_member = $("#btn-unfollow-member");
 
 	delete_group =
 	    function(params) {
@@ -106,8 +112,79 @@ $(document).ready(function(){
 				}
 			);	
 		};
-		
 	
+	var toFollow = "";
+	follow_member = 
+		function(params){
+			$('.checkbox').each(function() {
+				if (this.checked == true)
+					toFollow += (this.id) + ",";
+			});
+			params['following_emails'] = toFollow
+			$.post('/follow_member', params,
+				function(res){
+					notify(res,true);
+					setTimeout(function(){
+						window.location.reload();
+					},400);
+				});
+			toFollow = "";
+		};
+
+	var toUnfollow = "";
+	unfollow_member = 
+		function(params){
+			$('.checkbox').each(function() {
+				if (this.checked == true)
+					toUnfollow += (this.id) + ",";
+			});
+			params['unfollowing_emails'] = toUnfollow
+			$.post('/unfollow_member', params,
+				function(res){
+					notify(res,true);
+					setTimeout(function(){
+						window.location.reload();
+					},400);
+				});
+			toUnfollow = "";
+		}
+	
+	var toMute = "";
+	mute_member = 
+		function(params){
+			$('.checkbox').each(function() {
+				if (this.checked == true)
+					toMute += (this.id) + ",";
+			});
+			params['muting_emails'] = toMute
+			$.post('/mute_member', params,
+				function(res){
+					notify(res,true);
+					setTimeout(function(){
+						window.location.reload();
+					},400);
+				});
+			toMute = "";
+		};
+
+	var toUnmute = "";
+	unmute_member = 
+		function(params){
+			$('.checkbox').each(function() {
+				if (this.checked == true)
+					toUnmute += (this.id) + ",";
+			});
+			params['unmuting_emails'] = toUnmute
+			$.post('/unmute_member', params,
+				function(res){
+					notify(res,true);
+					setTimeout(function(){
+						window.location.reload();
+					},400);
+				});
+			toUnmute = "";
+		}
+
 	deactivate_group = 
 		function(params){
 			$.post('/deactivate_group', params, 
@@ -193,6 +270,11 @@ $(document).ready(function(){
  		btn_set_mod.unbind("click");
  		btn_set_admin.unbind("click");
  		btn_delete_group.unbind("click");
+ 		btn_mute_member.unbind("click");
+ 		btn_follow_member.unbind("click");
+ 		btn_unfollow_member.unbind("click");
+ 		btn_mute_member.unbind("click");
+ 		btn_unmute_member.unbind("click");
  		
  		btn_edit_group_info.bind("click");
  		btn_edit_settings.bind("click");
@@ -205,6 +287,11 @@ $(document).ready(function(){
  		btn_set_mod.bind("click");
  		btn_set_admin.bind("click");
  		btn_delete_group.bind("click");
+ 		btn_mute_member.bind("click");
+ 		btn_follow_member.bind("click");
+ 		btn_unfollow_member.bind("click");
+ 		btn_mute_member.bind("click");
+ 		btn_unmute_member.bind("click");
  		
 		var params = {'group_name': group_name};
 
@@ -216,6 +303,10 @@ $(document).ready(function(){
 		var make_admin = bind(edit_members_table_makeADMIN, params);
 		var make_mod = bind(edit_members_table_makeMOD, params);
 		var del_group = bind(delete_group, params);
+		var follow = bind(follow_member, params);
+		var unfollow = bind(unfollow_member, params);
+		var mute = bind(mute_member, params);
+		var unmute = bind(unmute_member, params);
 		
 		btn_activate_group.click(act_group);
 		btn_deactivate_group.click(deact_group);
@@ -225,6 +316,10 @@ $(document).ready(function(){
 		btn_set_mod.click(make_mod);
 		btn_set_admin.click(make_admin);
 		btn_delete_group.click(del_group);
+		btn_follow_member.click(follow);
+		btn_unfollow_member.click(unfollow);
+		btn_mute_member.click(mute);
+		btn_unmute_member.click(unmute);
 
 		btn_add_members.click(function() {
 			window.location = '/groups/' + group_name + '/add_members';

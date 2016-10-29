@@ -16,7 +16,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 
 from annoying.decorators import render_to
 from schema.models import UserProfile, Group, MemberGroup, Tag, FollowTag,\
-	MuteTag
+	MuteTag, FollowUserGroup, MuteUserGroup
 from html2text import html2text
 from django.contrib.auth.forms import AuthenticationForm
 from registration.forms import RegistrationForm
@@ -276,6 +276,19 @@ def group_page(request, group_name):
 		groups = []
 		
 	group_info = engine.main.group_info_page(user, group_name)
+	group = Group.objects.get(name=group_name)
+
+	if not group_info['following'] or group_info['no_emails']:
+		#follow/unfollow
+		for member_info in group_info['members']:
+			member = UserProfile.objects.get(email=member_info['email'])
+			member_info['followed'] = FollowUserGroup.objects.filter(user=user, group=group, following=member).exists()
+	else:
+		#mute/unmute
+		for member_info in group_info['members']:
+			member = UserProfile.objects.get(email=member_info['email'])
+			member_info['muted'] = MuteUserGroup.objects.filter(user=user, group=group, muting=member).exists()
+
 	if group_info['group']:
 		return {'user': request.user, 'groups': groups, 'group_info': group_info, 'group_page': True}
 	else:
@@ -965,6 +978,47 @@ def unfollow_thread(request):
 	try:
 		user = get_object_or_404(UserProfile, email=request.user.email)
 		res = engine.main.unfollow_thread(request.POST['thread_id'], user=user)
+		return HttpResponse(json.dumps(res), content_type="application/json")
+	except Exception, e:
+		logging.debug(e)
+		return HttpResponse(request_error, content_type="application/json")
+
+@login_required
+def follow_member(request):
+	try:		
+		user = get_object_or_404(UserProfile, email=request.user.email)
+		res = engine.main.follow_user(request.POST['following_emails'], request.POST['group_name'], user = user)
+		return HttpResponse(json.dumps(res), content_type="application/json")
+	except Exception, e:
+		logging.debug(e)
+		return HttpResponse(request_error, content_type="application/json")
+
+@login_required
+def unfollow_member(request):
+	try:		
+		user = get_object_or_404(UserProfile, email=request.user.email)
+		res = engine.main.unfollow_user(request.POST['unfollowing_emails'], request.POST['group_name'], user = user)
+		return HttpResponse(json.dumps(res), content_type="application/json")
+	except Exception, e:
+		logging.debug(e)
+		return HttpResponse(request_error, content_type="application/json")
+
+@login_required
+def mute_member(request):
+	print "im in views.py mute member"
+	try:		
+		user = get_object_or_404(UserProfile, email=request.user.email)
+		res = engine.main.mute_user(request.POST['muting_emails'], request.POST['group_name'], user = user)
+		return HttpResponse(json.dumps(res), content_type="application/json")
+	except Exception, e:
+		logging.debug(e)
+		return HttpResponse(request_error, content_type="application/json")
+
+@login_required
+def unmute_member(request):
+	try:		
+		user = get_object_or_404(UserProfile, email=request.user.email)
+		res = engine.main.unmute_user(request.POST['unmuting_emails'], request.POST['group_name'], user = user)
 		return HttpResponse(json.dumps(res), content_type="application/json")
 	except Exception, e:
 		logging.debug(e)
