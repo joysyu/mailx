@@ -37,6 +37,8 @@ $(document).ready(function(){
 				null,
 				null,
 				null,
+				null,
+				null,
 			]
 		});
 
@@ -99,6 +101,10 @@ $(document).ready(function(){
 	// var btn_undo_admin = $("#btn-undo-admin");
 	// var btn_undo_mod = $("#btn-undo-mod");
 	var btn_delete_group = $("#btn-delete-group");
+	var btn_mute_member = $("#btn-mute-member");
+	var btn_unmute_member = $("#btn_unmute_member");
+	var btn_follow_member = $("#btn_follow_member");
+	var btn_unfollow_member = $("#btn_unfollow_member");
 
 	var toDelete = "";
 	var toDeleteList = [];
@@ -597,31 +603,44 @@ $(document).ready(function(){
 		for(var i = 0; i< res.members.length; i++){
 			member = res.members[i];
 			tableData = [];
-			checkbox = '<input class="checkbox" type="checkbox" id ='+ res.members[i].id + '>';
-			email = res.members[i].email;
-			admin = res.members[i].admin;
-			moderator = res.members[i].moderator;
-			tableData.push(checkbox);
-			tableData.push(email);
-			if (admin == true) {
-				tableData.push('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
-			}
-			else {
+			checkMark = '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>';
+			tableData.push('<input class="checkbox" type="checkbox" id ='+ res.members[i].id + '>');
+			tableData.push(member.email);
+			if (member.admin == true) {
+				tableData.push(checkMark);
+			} else {
 				tableData.push('');
 			}
-			if (moderator == true) {
-				tableData.push('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
-			}
-			else {
+			if (member.moderator == true) {
+				tableData.push(checkMark);
+			} else {
 				tableData.push('');
 			}
+			if (member.muted) {
+				tableData.push(checkMark)
+			} else {
+				tableData.push('')
+			}
+			if (member.followed) {
+				tableData.push(checkMark)
+			} else {
+				tableData.push('')
+			}
+			console.log(tableData);
 			curr = members_table.fnAddData(tableData);
 
 			if (!res.admin){
 				members_table.fnSetColumnVis(0, false);
-			}
-			else{
+			} else{
 				members_table.fnSetColumnVis(0, true);
+			}
+
+			if (res.following && !res.no_emails) {
+				members_table.fnSetColumnVis(4, true);
+				members_table.fnSetColumnVis(5, false);
+			} else {
+				members_table.fnSetColumnVis(4, false);
+				members_table.fnSetColumnVis(5, true);
 			}
 		}
 		var params = {
@@ -634,15 +653,15 @@ $(document).ready(function(){
 		var del_group = bind(delete_group, params);
 		btn_delete_members.unbind("click");
 		btn_delete_members.bind("click");
-		btn_delete_members.click(delete_members);
 		btn_set_mod.unbind("click");
 		btn_set_mod.bind("click");
-		btn_set_mod.click(make_mod);
 		btn_set_admin.unbind("click");
 		btn_set_admin.bind("click");
-		btn_set_admin.click(make_admin);
 		btn_delete_group.unbind("click");
 		btn_delete_group.bind("click");
+		btn_delete_members.click(delete_members);
+		btn_set_mod.click(make_mod);
+		btn_set_admin.click(make_admin);
 		btn_delete_group.click(del_group);
 		// btn_undo_admin.unbind("click");
 		// btn_undo_admin.bind("click");
@@ -651,22 +670,34 @@ $(document).ready(function(){
 		// btn_undo_mod.bind("click");
 		// btn_undo_mod.click(undo_mod);
 
-
 		if (!res.admin){
 			btn_delete_members.hide();
 			btn_set_admin.hide();
 			btn_set_mod.hide();
 			btn_delete_group.hide();
 			$('#members-list-area').css('display', 'none');
-		}
-		else{
+		} else {
 			btn_delete_members.show();
 			btn_set_admin.show();
 			btn_set_mod.show();
 			btn_delete_group.show();
 			$('#members-list-area').css('display', '');
 		}
-		};
+
+		if (res.following && !res.no_emails) {
+			console.log("here");
+			btn_mute_member.show();
+			btn_unmute_member.show();
+			btn_follow_member.hide();
+			btn_unfollow_member.hide();
+		} else {
+			console.log("in else");
+			btn_mute_member.hide();
+			btn_unmute_member.hide();
+			btn_follow_member.show();
+			btn_unfollow_member.show();
+		}
+	}
 
 	
 	function notify(res, on_success){

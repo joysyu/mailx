@@ -582,15 +582,19 @@ def group_info(group_name, user):
 				res['admin'] = admin
 				res['moderator'] = mod
 				res['subscribed'] = True
-			
+				res['following'] = membergroup.always_follow_thread
+				res['no_emails'] = membergroup.no_emails
+
 			member_info = {'id': membergroup.id,
 						   'email': membergroup.member.email,
 						   'group_name': group_name, 
 						   'admin': admin, 
 						   'member': True, 
 						   'moderator': mod, 
-						   'active': membergroup.member.is_active}
-			
+						   'active': membergroup.member.is_active,
+						   'muted':	MuteUserGroup.objects.filter(user=user, group=group, muting=membergroup.member).exists(),
+						   'followed':FollowUserGroup.objects.filter(user=user, group=group, following=membergroup.member).exists()}
+
 			res['members'].append(member_info)
 	except Group.DoesNotExist:
 		res['code'] = msg_code['GROUP_NOT_FOUND_ERROR']	
