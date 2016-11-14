@@ -167,6 +167,7 @@ $(document).ready(function(){
 					toMute += (this.id) + ",";
 			});
 			params['muting_emails'] = toMute
+			console.log("im in mute_member function");
 			$.post('/mute_member', params,
 				function(res){
 					notify(res,true);
@@ -220,6 +221,7 @@ function bind(fnc, val ) {
 }
 
 	btn_mute_member.click(function() {
+		console.log("clicked on mute member");
 		mute_member({'group_name': group_name});
 	});
 

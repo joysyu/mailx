@@ -288,7 +288,7 @@ def group_page(request, group_name):
 	group_info = engine.main.group_info_page(user, group_name)
 	group = Group.objects.get(name=group_name)
 
-	if not group_info['following'] or group_info['no_emails']:
+	if not group_info['no_emails']:
 		#follow/unfollow
 		for member_info in group_info['members']:
 			member = UserProfile.objects.get(email=member_info['email'])
