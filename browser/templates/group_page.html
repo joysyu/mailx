@@ -101,7 +101,7 @@
 					<button type="button" id="btn-add-members" style="display: none;">Add Members</button>
 				{% endif %}
 
-				{% if group_info.following and not group_info.no_emails %}
+				{% if not group_info.no_emails %}
 					<button type="button" id="btn-mute-member">Mute Member</button>
 					<button type="button" id="btn-unmute-member">Unmute Member</button>
 				{% else %}
