@@ -1385,7 +1385,6 @@ def unfollow_user(unfollowing_emails, group_name, user=None, email=None):
 	return res
 
 def mute_user(muting_emails, group_name, user=None, email=None):
-	print "im in main.py mute user!!"
 	res = {'status': False}
 	group = Group.objects.get(name=group_name)
 	muting_user = None
@@ -1397,14 +1396,10 @@ def mute_user(muting_emails, group_name, user=None, email=None):
 		membergroups = MemberGroup.objects.filter(group=group).select_related()
 		muting_emails = muting_emails.split(",")
 		muting_emails = [int(memberGroupID) for memberGroupID in muting_emails if memberGroupID != '']
-		print "muting emails are"
-		print muting_emails
 		for membergroup in membergroups:
 			if membergroup.id in muting_emails:
 				muting_email = membergroup.member.email
 				muting_user = UserProfile.objects.get(email=muting_email)
-				print "muting user is"
-				print muting_user
 				try: 
 					userGroup_mute = MuteUserGroup.objects.get(user = user, group = group, muting = muting_user)
 				except MuteUserGroup.DoesNotExist:

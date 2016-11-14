@@ -90,9 +90,8 @@
 				</div>
 				<br />
 				<hr />
-
-				<h3>Members List</h3>
 				{% if group_info.admin %}
+				<h3>Members List</h3>
 
 					<button type="button" id="btn-add-members">Add Members</button>
 					<button type="button" id="btn-del-members">Delete Members</button>
@@ -110,15 +109,12 @@
 					<button type="button" id="btn-unfollow-member">Unfollow Member</button>
 				{% endif %}
 
-				<table id="members-table" class="display" cellspacing="0" width="100%">
+				{% if group_info.admin %}
+					<table id="members-table" class="display" cellspacing="0" width="100%">
 						<thead>
 							<tr>
-								{% if group_info.admin %}
 								<th>Select</th>
-								{% endif %}
-
 								<th>Email</th>
-
 								{% if flavour != "mobile" %}
 									<th>Joined</th>
 									<th>Admin</th>
@@ -135,23 +131,19 @@
 						
 						<tfoot>
 						<tr>
-							{% if group_info.admin %}
-								<th>Select</th>
-								{% endif %}
+							<th>Select</th>
+							<th>Email</th>
+							{% if flavour != "mobile" %}
+								<th>Joined</th>
+								<th>Admin</th>
+								<th>Moderator</th>
+							{% endif %}
 
-								<th>Email</th>
-
-								{% if flavour != "mobile" %}
-									<th>Joined</th>
-									<th>Admin</th>
-									<th>Moderator</th>
-								{% endif %}
-
-								{% if group_info.following and not group_info.no_emails %}
-									<th>Muted</th>
-				    			{% else %}
-				    				<th>Following</th>
-								{% endif %}
+							{% if group_info.following and not group_info.no_emails %}
+								<th>Muted</th>
+				    		{% else %}
+				    			<th>Following</th>
+							{% endif %}
 						</tr>
 						</tfoot>
 						
@@ -195,7 +187,6 @@
 													<th></th>
 												{% endif %}
 											{% endif %}
-
 										</tr>
 									{% else %}
 										<td>{{ member.email }}</td>
@@ -212,7 +203,7 @@
 												<th></th>
 											{% endif %}
 										{% endif %}
-										
+
 										{% if group_info.following and not group_info.no_emails %}
 											{% if member.muted %}
 												<th><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></th>
@@ -227,7 +218,6 @@
 												<th></th>
 											{% endif %}
 										{% endif %}
-
 									</tr>
 								{% endif %}
 							{% endfor %}
@@ -297,6 +287,7 @@
 				{% endif %}
 				</div>
 			</div>
+		{% endif %}
 	{% endblock %}
 	{% block customjs %}
 		<script type="text/javascript" src="/static/javascript/group_page.js"></script>

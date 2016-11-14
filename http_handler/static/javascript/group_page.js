@@ -20,16 +20,14 @@ $(document).ready(function(){
 	var admin_buttons = [btn_add_members, btn_edit_group_info, btn_set_admin, btn_set_mod, 
 						btn_delete_members, btn_add_list, action_select, btn_delete_group];
 
+	var btn_mute_member = $("#btn-mute-member");
+	var btn_unmute_member = $("#btn-unmute-member");
+	var btn_follow_member = $("#btn-follow-member");
+	var btn_unfollow_member = $("#btn-unfollow-member");
+
 	if (admin) {
 		var members_table = $('#members-table').dataTable({
-			"aoColumns": [
-				{ 'bSortable': false},
-				null,
-				null,
-				null,
-				null,
-				null
-			]
+			"aoColumns": [ { 'bSortable': false}, null, null, null, null, null]
 		}),
 			lists_table = $('#lists-table').dataTable({
 			"aoColumns": [ { 'bSortable': false}, null, null, null, null]
@@ -39,11 +37,6 @@ $(document).ready(function(){
 		var members_table = $('#members-table').dataTable({}),
 			lists_table = $('#lists-table').dataTable({});
 	}
-
-	var btn_mute_member = $("#btn-mute-member");
-	var btn_unmute_member = $("#btn-unmute-member");
-	var btn_follow_member = $("#btn-follow-member");
-	var btn_unfollow_member = $("#btn-unfollow-member");
 
 	delete_group =
 	    function(params) {
@@ -60,36 +53,76 @@ $(document).ready(function(){
 	        }
 	    }
 		
-	unsubscribe_group = 
-		function(params){
-			$.post('/unsubscribe_group', params, 
-				function(res){
-					if (res.status) {
-						member = false;
-						fix_visibility();
-						$(".member").hide();
-						var aPos = members_table.fnGetPosition($(".my_row").get(0)); 
-						members_table.fnDeleteRow(aPos);
-					}
-					notify(res, true);
-				}
-			);	
-		};
+	// activating and deactivating does nothing
+
+	// activate_group = 
+	// 	function(params){
+	// 		$.post('/activate_group', params, 
+	// 			function(res){
+	// 				if (res.status) {
+	// 					$(".group_active").text('True');
+	// 					group_active = true;
+	// 					fix_visibility();
+	// 				}
+	// 				notify(res, true);
+	// 			}
+	// 		);	
+	// 	};
 		
-	activate_group = 
-		function(params){
-			$.post('/activate_group', params, 
-				function(res){
-					if (res.status) {
-						$(".group_active").text('True');
-						group_active = true;
-						fix_visibility();
-					}
-					notify(res, true);
-				}
-			);	
-		};
 	
+	// deactivate_group = 
+	// 	function(params){
+	// 		$.post('/deactivate_group', params, 
+	// 			function(res){
+	// 				if (res.status) {
+	// 					$(".group_active").text('False');
+	// 					group_active = false;
+	// 					fix_visibility();
+	// 				}
+	// 				notify(res, true);
+	// 			}
+	// 		);	
+	// 	};	
+
+	var post_edit_members = function(params) {
+		$.post('/edit_members', params, function(res){
+			notify(res,true);
+			setTimeout(function(){
+				window.location.reload();
+			}, 400);
+		});
+	};
+
+	var edit_lists_adjust_can_post = function(selected, can_post) {
+		var params = {'group_name' : group_name, 'lists' : selected, 'can_post' : can_post};
+		$.post('/adjust_list_can_post', params, function(res){
+			notify(res, true);
+			setTimeout(function(){
+				window.location.reload();
+			}, 400);
+		});
+	}
+
+	var edit_lists_adjust_can_receive = function(selected, can_receive) {
+		var params = {'group_name' : group_name, 'lists' : selected, 'can_receive' : can_receive};
+		$.post('/adjust_list_can_receive', params, function(res){
+			notify(res, true);
+			setTimeout(function(){
+				window.location.reload();
+			}, 400);
+		});
+	}		
+		
+	var edit_lists_delete = function(selected) {
+		var params = {'group_name' : group_name, 'lists' : selected};
+		$.post('/delete_list', params, function(res){
+			notify(res, true);
+			setTimeout(function(){
+				window.location.reload();
+			}, 400);
+		});
+	}
+
 	var toFollow = "";
 	follow_member = 
 		function(params){
@@ -162,89 +195,6 @@ $(document).ready(function(){
 			toUnmute = "";
 		}
 
-	deactivate_group = 
-		function(params){
-			$.post('/deactivate_group', params, 
-				function(res){
-					if (res.status) {
-						$(".group_active").text('False');
-						group_active = false;
-						fix_visibility();
-					}
-					notify(res, true);
-				}
-			);	
-		};	
-	// activating and deactivating does nothing
-
-	// activate_group = 
-	// 	function(params){
-	// 		$.post('/activate_group', params, 
-	// 			function(res){
-	// 				if (res.status) {
-	// 					$(".group_active").text('True');
-	// 					group_active = true;
-	// 					fix_visibility();
-	// 				}
-	// 				notify(res, true);
-	// 			}
-	// 		);	
-	// 	};
-		
-	
-	// deactivate_group = 
-	// 	function(params){
-	// 		$.post('/deactivate_group', params, 
-	// 			function(res){
-	// 				if (res.status) {
-	// 					$(".group_active").text('False');
-	// 					group_active = false;
-	// 					fix_visibility();
-	// 				}
-	// 				notify(res, true);
-	// 			}
-	// 		);	
-	// 	};	
-
-	var post_edit_members = function(params) {
-		$.post('/edit_members', params, function(res){
-			notify(res,true);
-			setTimeout(function(){
-				window.location.reload();
-			}, 400);
-		});
-	};
-
-	var edit_lists_adjust_can_post = function(selected, can_post) {
-		var params = {'group_name' : group_name, 'lists' : selected, 'can_post' : can_post};
-		$.post('/adjust_list_can_post', params, function(res){
-			notify(res, true);
-			setTimeout(function(){
-				window.location.reload();
-			}, 400);
-		});
-	}
-
-	var edit_lists_adjust_can_receive = function(selected, can_receive) {
-		var params = {'group_name' : group_name, 'lists' : selected, 'can_receive' : can_receive};
-		$.post('/adjust_list_can_receive', params, function(res){
-			notify(res, true);
-			setTimeout(function(){
-				window.location.reload();
-			}, 400);
-		});
-	}		
-		
-	var edit_lists_delete = function(selected) {
-		var params = {'group_name' : group_name, 'lists' : selected};
-		$.post('/delete_list', params, function(res){
-			notify(res, true);
-			setTimeout(function(){
-				window.location.reload();
-			}, 400);
-		});
-	}
-
 	// attach handlers to buttons 
 	btn_add_members.click(function() {
 		go_to('add_members');
@@ -262,6 +212,29 @@ $(document).ready(function(){
 		go_to('add_list');
 	});
 
+
+function bind(fnc, val ) {
+	return function () {
+		return fnc(val);
+	};
+}
+
+	btn_mute_member.click(function() {
+		mute_member({'group_name': group_name});
+	});
+
+	btn_unmute_member.click(function() {
+		unmute_member({'group_name': group_name});
+	});
+
+	btn_follow_member.click(function() {
+		follow_member({'group_name': group_name});
+	});
+
+	btn_unfollow_member.click(function() {
+		unfollow_member({'group_name': group_name});
+	});
+
 	function post_edit_members(params) {
 		$.post('/edit_members', params,
 			function(res){
@@ -272,76 +245,6 @@ $(document).ready(function(){
 			}
 		);
 	}	
-			
-	function bind_buttons() {
-		btn_edit_group_info.unbind("click");
-		btn_edit_settings.unbind("click");
- 		btn_activate_group.unbind("click");
- 		btn_deactivate_group.unbind("click");
- 		btn_subscribe_group.unbind("click");
- 		btn_unsubscribe_group.unbind("click");
- 		btn_add_members.unbind("click");
- 		btn_delete_members.unbind("click");
- 		btn_set_mod.unbind("click");
- 		btn_set_admin.unbind("click");
- 		btn_delete_group.unbind("click");
- 		btn_mute_member.unbind("click");
- 		btn_follow_member.unbind("click");
- 		btn_unfollow_member.unbind("click");
- 		btn_mute_member.unbind("click");
- 		btn_unmute_member.unbind("click");
- 		
- 		btn_edit_group_info.bind("click");
- 		btn_edit_settings.bind("click");
- 		btn_activate_group.bind("click");
- 		btn_deactivate_group.bind("click");
- 		btn_subscribe_group.bind("click");
- 		btn_unsubscribe_group.bind("click");
- 		btn_add_members.bind("click");
- 		btn_delete_members.bind("click");
- 		btn_set_mod.bind("click");
- 		btn_set_admin.bind("click");
- 		btn_delete_group.bind("click");
- 		btn_mute_member.bind("click");
- 		btn_follow_member.bind("click");
- 		btn_unfollow_member.bind("click");
- 		btn_mute_member.bind("click");
- 		btn_unmute_member.bind("click");
- 		
-		var params = {'group_name': group_name};
-
- 		var act_group = bind(activate_group, params);
-		var deact_group = bind(deactivate_group, params);
-		var sub_group = bind(subscribe_group, params);
-		var unsub_group = bind(unsubscribe_group, params);
-		var delete_members = bind(edit_members_table_del, params);
-		var make_admin = bind(edit_members_table_makeADMIN, params);
-		var make_mod = bind(edit_members_table_makeMOD, params);
-		var del_group = bind(delete_group, params);
-		var follow = bind(follow_member, params);
-		var unfollow = bind(unfollow_member, params);
-		var mute = bind(mute_member, params);
-		var unmute = bind(unmute_member, params);
-		
-		btn_activate_group.click(act_group);
-		btn_deactivate_group.click(deact_group);
-		btn_subscribe_group.click(sub_group);
-		btn_unsubscribe_group.click(unsub_group);
-		btn_delete_members.click(delete_members);
-		btn_set_mod.click(make_mod);
-		btn_set_admin.click(make_admin);
-		btn_delete_group.click(del_group);
-		btn_follow_member.click(follow);
-		btn_unfollow_member.click(unfollow);
-		btn_mute_member.click(mute);
-		btn_unmute_member.click(unmute);
-
-		btn_add_members.click(function() {
-			window.location = '/groups/' + group_name + '/add_members';
-		});
-		
-		btn_edit_settings.click(function() {
-			window.location = '/groups/' + group_name + '/edit_my_settings';
 
 	btn_subscribe_group.click(function(){
 		var params = {'group_name' : group_name};

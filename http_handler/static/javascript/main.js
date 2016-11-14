@@ -626,7 +626,6 @@ $(document).ready(function(){
 			} else {
 				tableData.push('')
 			}
-			console.log(tableData);
 			curr = members_table.fnAddData(tableData);
 
 			if (!res.admin){
@@ -685,13 +684,11 @@ $(document).ready(function(){
 		}
 
 		if (res.following && !res.no_emails) {
-			console.log("here");
 			btn_mute_member.show();
 			btn_unmute_member.show();
 			btn_follow_member.hide();
 			btn_unfollow_member.hide();
 		} else {
-			console.log("in else");
 			btn_mute_member.hide();
 			btn_unmute_member.hide();
 			btn_follow_member.show();

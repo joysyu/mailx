@@ -495,7 +495,6 @@ def edit_group_settings(request):
 		return HttpResponse(request_error, content_type="application/json")
 
 
-
 @login_required
 def activate_group(request):
 	try:
@@ -1145,7 +1144,6 @@ def unfollow_member(request):
 
 @login_required
 def mute_member(request):
-	print "im in views.py mute member"
 	try:		
 		user = get_object_or_404(UserProfile, email=request.user.email)
 		res = engine.main.mute_user(request.POST['muting_emails'], request.POST['group_name'], user = user)
