@@ -685,8 +685,6 @@ def insert_post(request):
 		
 		msg_id = res['msg_id']
 		to_send =  res['recipients']
-		print "I'm in insert_post in view.py and this is to_send"
-		print to_send
 		
 		post_addr = '%s <%s>' %(group_name, group_name + '@' + HOST)
 		
@@ -710,22 +708,27 @@ def insert_post(request):
 			tag_followings = FollowTag.objects.filter(group=g, tag__in=res['tag_objs'], user__in=recips)
 			tag_mutings = MuteTag.objects.filter(group=g, tag__in=res['tag_objs'], user__in=recips)
 			
-			
+			#recips are members in the group who are following/muting the user.
+			user_followings = FollowUserGroup.objects.filter(group=g, following = user, user__in=recips)
+			user_mutings = MuteUserGroup.objects.filter(group=g, muting = user, user__in=recips)
+
 			for recip in recips:
 				membergroup = membergroups.filter(member=recip)[0]
 				following = followings.filter(user=recip).exists()
 				muting = mutings.filter(user=recip).exists()
 				tag_following = tag_followings.filter(user=recip)
 				tag_muting = tag_mutings.filter(user=recip)
+				user_following = user_followings.filter(user=recip)
+				user_muting = user_mutings.filter(user=recip)
 
 				original_group = None
 				if request.POST.__contains__('original_group'):
 					original_group = request.POST['original_group'] + '@' + HOST
 
-				ps_blurb = html_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, res['tag_objs'], original_group)
+				ps_blurb = html_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, res['tag_objs'], original_group)
 				mail.Html = msg_text + ps_blurb	
 				
-				ps_blurb = plain_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, res['tag_objs'], original_group)
+				ps_blurb = plain_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, res['tag_objs'], original_group)
 				mail.Body = html2text(msg_text) + ps_blurb	
 			
 				relay_mailer.deliver(mail, To = recip.email)

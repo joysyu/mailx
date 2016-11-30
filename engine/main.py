@@ -835,16 +835,16 @@ def _create_post(group, subject, message_text, user, sender_addr, forwarding_lis
 	for m in group_members:
 		if not m.no_emails and m.member.email != sender_addr:
 			mute_tag = MuteTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			#mute_user = MuteUserGroup.objects.filter(user = m.member, group = group , muting = user).exists()
-			#if not mute_tag and not mute_user:
-			if not mute_tag:
+			# Add a member to recipients if the member is not muting the user (sender).
+			mute_user = MuteUserGroup.objects.filter(user = m.member, group = group , muting = user).exists()
+			if not mute_tag and not mute_user:
 				recipients.append(m.member.email)
 		else:
-			# If any recipient is following the tag or the user, he/she will receive the email.
+			# If any recipient is following the tag, he/she will receive the email.
 			follow_tag = FollowTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			#follow_user = FollowUserGroup.objects.filter(user = m.member, group = group, following = user).exists()
-			#if follow_tag or follow_user:
-			if follow_tag:
+			# Add a member to recipients if the member is following the user (sender).
+			follow_user = FollowUserGroup.objects.filter(user = m.member, group = group, following = user).exists()
+			if follow_tag or follow_user:
 				recipients.append(m.member.email)
 	
 	if user:

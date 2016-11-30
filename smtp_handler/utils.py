@@ -324,7 +324,7 @@ def plain_forwarded_blurb(group_name, to_list, original_list_email=None):
 	body = '%s%s%s' % (HTML_SUBHEAD, content, HTML_SUBTAIL)
 	return body
 
-def html_ps(group, thread, post_id, membergroup, following, muting, tag_following, tag_muting, tags, original_list_email=None):
+def html_ps(group, thread, post_id, membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, tags, original_list_email=None):
 	#follow_addr = 'mailto:%s' %(group_name + '+' + FOLLOW_SUFFIX + '@' + HOST)
 	#unfollow_addr = 'mailto:%s' %(group_name + '+'  + UNFOLLOW_SUFFIX + '@' + HOST)
 	content = ""
@@ -341,6 +341,9 @@ def html_ps(group, thread, post_id, membergroup, following, muting, tag_followin
 	if membergroup.no_emails or not membergroup.always_follow_thread:
 		follow_addr = '%s%s' % (FOLLOW_ADDR, tid)
 		unfollow_addr = '%s%s' % (UNFOLLOW_ADDR, tid)
+
+		if user_following:
+			content += 'You\'re currently following the user %s. <BR>' % (user_following.following.email)
 		
 		if following:
 			content += 'You\'re currently following this thread. <a href="%s">Un-Follow thread</a>.<BR>' % (unfollow_addr)
@@ -354,9 +357,14 @@ def html_ps(group, thread, post_id, membergroup, following, muting, tag_followin
 					content += 'You\'re currently following the tag %s. <BR>' % (tag_names[0])
 			else:
 				content += 'You currently aren\'t receiving any replies to this thread. <a href="%s">Follow thread</a>.<BR>' % (follow_addr)
+
 	else:
 		mute_addr = '%s%s' % (MUTE_ADDR, tid)
 		unmute_addr = '%s%s' % (UNMUTE_ADDR, tid)
+
+		if user_muting:
+			content += 'You\'re currently muting the user %s. <BR>' % (user_muting.muting.email)
+
 		if muting:
 			content += 'You\'re currently muting this thread. <a href="%s">Un-Mute thread</a>.<BR>' % (unmute_addr)
 		else:
@@ -369,7 +377,7 @@ def html_ps(group, thread, post_id, membergroup, following, muting, tag_followin
 					content += 'You\'re currently muting the tag %s. <BR>' % (tag_names[0])
 			else:
 				content += 'You\'re currently receiving emails to this thread. <a href="%s">Mute thread</a>.<BR>' % (mute_addr)
-		
+
 	content += _insert_tag_line(group, tags, membergroup, tag_following, tag_muting)
 
 	addr = EDIT_SETTINGS_ADDR % (HOST, group.name)
@@ -386,7 +394,7 @@ def html_ps(group, thread, post_id, membergroup, following, muting, tag_followin
 	body = '%s%s%s' % (HTML_SUBHEAD, content, HTML_SUBTAIL)
 	return body
 
-def plain_ps(group, thread, post_id, membergroup, following, muting, tag_following, tag_muting, tags, original_list_email=None):
+def plain_ps(group, thread, post_id, membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, tags, original_list_email=None):
 
 	content = ""
 	if original_list_email:
@@ -404,6 +412,9 @@ def plain_ps(group, thread, post_id, membergroup, following, muting, tag_followi
 		follow_addr = 'mailto:%s' % (group_name + '+' + str(tid) + FOLLOW_SUFFIX + '@' + HOST)
 		unfollow_addr = 'mailto:%s' % (group_name + '+' + str(tid) + UNFOLLOW_SUFFIX + '@' + HOST)
 
+		if user_following:
+			content += 'You\'re currently following the user %s. <BR>' % (user_following.following.email)
+			
 		if following:
 			content += 'You\'re currently following this thread. Un-Follow thread<%s>.\n' % (unfollow_addr)
 		else:
@@ -419,6 +430,9 @@ def plain_ps(group, thread, post_id, membergroup, following, muting, tag_followi
 	else:
 		mute_addr = 'mailto:%s' % (group_name + '+' + str(tid) + MUTE_SUFFIX + '@' + HOST)
 		unmute_addr = 'mailto:%s' % (group_name + '+' + str(tid) + UNMUTE_SUFFIX + '@' + HOST)
+
+		if user_muting:
+			content += 'You\'re currently muting the user %s. <BR>' % (user_muting.muting.email)
 
 		if muting:
 			content += 'You\'re currently muting this thread. Un-Mute thread<%s>.\n' % (unmute_addr)
