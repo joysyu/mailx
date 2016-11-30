@@ -371,6 +371,10 @@ def handle_post(message, address=None, host=None):
 				tag_followings = FollowTag.objects.filter(group=g, tag__in=res['tag_objs'], user__in=recips)
 				tag_mutings = MuteTag.objects.filter(group=g, tag__in=res['tag_objs'], user__in=recips)
 				
+				#recips are members in the group who are following/muting the user.
+				user_followings = FollowUserGroup.objects.filter(group=g, following = user, user__in=recips)
+				user_mutings = MuteUserGroup.objects.filter(group=g, muting = user, user__in=recips)
+				
 				for recip in recips:
 					
 					# Don't send email to the sender if it came from email
@@ -383,12 +387,14 @@ def handle_post(message, address=None, host=None):
 					muting = mutings.filter(user=recip).exists()
 					tag_following = tag_followings.filter(user=recip)
 					tag_muting = tag_mutings.filter(user=recip)
+					user_following = user_followings.filter(user=recip)
+				    user_muting = user_mutings.filter(user=recip)
 				
-					html_ps_blurb = html_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, res['tag_objs'], original_list_email=original_list_email)
+					html_ps_blurb = html_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, res['tag_objs'], original_list_email=original_list_email)
 					html_ps_blurb = unicode(html_ps_blurb)
 					mail.Html = get_new_body(msg_text, html_ps_blurb, 'html')
 					
-					plain_ps_blurb = plain_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, res['tag_objs'], original_list_email=original_list_email)
+					plain_ps_blurb = plain_ps(g, t, res['post_id'], membergroup, following, muting, tag_following, tag_muting, user_following, user_muting, res['tag_objs'], original_list_email=original_list_email)
 					mail.Body = get_new_body(msg_text, plain_ps_blurb, 'plain')
 		
 					relay.deliver(mail, To = recip.email)
