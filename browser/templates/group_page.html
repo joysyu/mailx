@@ -188,6 +188,7 @@
 											{% endif %}
 										</tr>
 									{% else %}
+										<td><input class="checkbox checkbox-user" type="checkbox" id ={{ member.id }}></td>
 										<td>{{ member.email }}</td>
 										{% if flavour != "mobile" %}
 											<td>{{ member.joined }}</td>
