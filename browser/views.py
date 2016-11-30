@@ -709,8 +709,8 @@ def insert_post(request):
 			tag_mutings = MuteTag.objects.filter(group=g, tag__in=res['tag_objs'], user__in=recips)
 			
 			#recips are members in the group who are following/muting the user.
-			user_followings = FollowUserGroup.objects.filter(group=g, following = user, user__in=recips)
 			user_mutings = MuteUserGroup.objects.filter(group=g, muting = user, user__in=recips)
+			user_followings = FollowUserGroup.objects.filter(group=g, following = user, user__in=recips)
 
 			for recip in recips:
 				membergroup = membergroups.filter(member=recip)[0]
