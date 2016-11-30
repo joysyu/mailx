@@ -101,6 +101,7 @@
 					<button type="button" id="btn-add-members" style="display: none;">Add Members</button>
 				{% endif %}
 
+				{% if group_info.subscribed %}
 				{% if not group_info.no_emails %}
 					<button type="button" id="btn-mute-member">Mute Member</button>
 					<button type="button" id="btn-unmute-member">Unmute Member</button>
@@ -108,7 +109,9 @@
 					<button type="button" id="btn-follow-member">Follow Member</button>
 					<button type="button" id="btn-unfollow-member">Unfollow Member</button>
 				{% endif %}
+				{% endif %}
 
+				{% if group_info.subscribed %}
 					<table id="members-table" class="display" cellspacing="0" width="100%">
 						<thead>
 							<tr>
@@ -284,6 +287,7 @@
 								{% endfor %}
 							</tbody>
 						</table>
+				{% endif %}
 				</div>
 			</div>
 		{% endif %}

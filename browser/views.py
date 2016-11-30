@@ -288,16 +288,17 @@ def group_page(request, group_name):
 	group_info = engine.main.group_info_page(user, group_name)
 	group = Group.objects.get(name=group_name)
 
-	if group_info['no_emails']:
-		#follow/unfollow
-		for member_info in group_info['members']:
-			member = UserProfile.objects.get(email=member_info['email'])
-			member_info['followed'] = FollowUserGroup.objects.filter(user=user, group=group, following=member).exists()
-	else:
-		#mute/unmute
-		for member_info in group_info['members']:
-			member = UserProfile.objects.get(email=member_info['email'])
-			member_info['muted'] = MuteUserGroup.objects.filter(user=user, group=group, muting=member).exists()
+	if 'no_emails' in group_info.keys():
+		if group_info['no_emails']:
+			#follow/unfollow
+			for member_info in group_info['members']:
+				member = UserProfile.objects.get(email=member_info['email'])
+				member_info['followed'] = FollowUserGroup.objects.filter(user=user, group=group, following=member).exists()
+		else:
+			#mute/unmute
+			for member_info in group_info['members']:
+				member = UserProfile.objects.get(email=member_info['email'])
+				member_info['muted'] = MuteUserGroup.objects.filter(user=user, group=group, muting=member).exists()
 
 	if group_info['group']:
 		return {'user': request.user, 'groups': groups, 'group_info': group_info, 'group_page': True, 'admin_address' : group_name + '+admins@' + HOST}
