@@ -288,7 +288,7 @@ def group_page(request, group_name):
 	group_info = engine.main.group_info_page(user, group_name)
 	group = Group.objects.get(name=group_name)
 
-	if not group_info['no_emails']:
+	if group_info['no_emails']:
 		#follow/unfollow
 		for member_info in group_info['members']:
 			member = UserProfile.objects.get(email=member_info['email'])
@@ -674,7 +674,7 @@ def insert_post(request):
 		msg_text = request.POST['msg_text']
 		
 		res = engine.main.insert_post_web(group_name, request.POST['subject'],  msg_text, user)
-		
+
 		subj_tag = ''
 		for tag in res['tags']:
 			subj_tag += '[%s]' % tag['name']
@@ -685,6 +685,8 @@ def insert_post(request):
 		
 		msg_id = res['msg_id']
 		to_send =  res['recipients']
+		print "I'm in insert_post in view.py and this is to_send"
+		print to_send
 		
 		post_addr = '%s <%s>' %(group_name, group_name + '@' + HOST)
 		

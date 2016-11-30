@@ -835,14 +835,16 @@ def _create_post(group, subject, message_text, user, sender_addr, forwarding_lis
 	for m in group_members:
 		if not m.no_emails and m.member.email != sender_addr:
 			mute_tag = MuteTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			mute_user = MuteUserGroup.objects.filter(user = m.member, group = group , muting = user).exists()
-			if not mute_tag and not mute_user:
+			#mute_user = MuteUserGroup.objects.filter(user = m.member, group = group , muting = user).exists()
+			#if not mute_tag and not mute_user:
+			if not mute_tag:
 				recipients.append(m.member.email)
 		else:
 			# If any recipient is following the tag or the user, he/she will receive the email.
 			follow_tag = FollowTag.objects.filter(tag__in=tag_objs, group=group, user=m.member).exists()
-			follow_user = FollowUserGroup.objects.filter(user = m.member, group = group, following = user).exists()
-			if follow_tag or follow_user:
+			#follow_user = FollowUserGroup.objects.filter(user = m.member, group = group, following = user).exists()
+			#if follow_tag or follow_user:
+			if follow_tag:
 				recipients.append(m.member.email)
 	
 	if user:
@@ -1333,7 +1335,7 @@ def follow_user(following_emails, group_name, user=None, email=None):
 		if email:
 			user = UserProfile.objects.get(email=email)
 	
-		# Get the following_email form following_emails' IDs
+		# Get the following_email from following_emails' IDs
 		membergroups = MemberGroup.objects.filter(group=group).select_related()
 		following_emails = following_emails.split(",")
 		following_emails = [int(memberGroupID) for memberGroupID in following_emails if memberGroupID != '']
