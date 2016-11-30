@@ -2,7 +2,7 @@ import email, re
 from lamson.server import Relay
 from config.settings import *
 from lamson_subclass import MurmurMailResponse
-from schema.models import Group, MemberGroup, Thread, Following, Mute
+from schema.models import Group, MemberGroup, Thread, Following, Mute, FollowUserGroup, MuteUserGroup
 from http_handler.settings import BASE_URL
 
 
