@@ -343,6 +343,7 @@ def html_ps(group, thread, post_id, membergroup, following, muting, tag_followin
 		unfollow_addr = '%s%s' % (UNFOLLOW_ADDR, tid)
 
 		if user_following:
+			content += 'BLAH BLAH BLAH BLAH BLAH BALH BLAH BLAH BLAH BLAH BLAH BALH BLAH BLAH BLAH BLAH BLAH BALH BLAH BLAH BLAH BLAH BLAH BALH'
 			content += 'You\'re currently following the user %s. <BR>' % (user_following.following.email)
 		
 		if following:
@@ -414,7 +415,7 @@ def plain_ps(group, thread, post_id, membergroup, following, muting, tag_followi
 
 		if user_following:
 			content += 'You\'re currently following the user %s. <BR>' % (user_following.following.email)
-			
+
 		if following:
 			content += 'You\'re currently following this thread. Un-Follow thread<%s>.\n' % (unfollow_addr)
 		else:
@@ -430,9 +431,6 @@ def plain_ps(group, thread, post_id, membergroup, following, muting, tag_followi
 	else:
 		mute_addr = 'mailto:%s' % (group_name + '+' + str(tid) + MUTE_SUFFIX + '@' + HOST)
 		unmute_addr = 'mailto:%s' % (group_name + '+' + str(tid) + UNMUTE_SUFFIX + '@' + HOST)
-
-		if user_muting:
-			content += 'You\'re currently muting the user %s. <BR>' % (user_muting.muting.email)
 
 		if muting:
 			content += 'You\'re currently muting this thread. Un-Mute thread<%s>.\n' % (unmute_addr)
