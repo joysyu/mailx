@@ -1035,7 +1035,7 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 			# # This is equivalent to muting the thread.
 
 			# # muting_authors is all the emails of users who are muting either author or reply or author of original post.
-			muting_authors = MuteUserGroup.objects.filter(group = group, muting = user).select_related()
+			muting_authors = list(MuteUserGroup.objects.filter(group = group, muting = user).select_related())
 			muting_originalPostAuthors = MuteUserGroup.objects.filter(group = group, muting = post.author).select_related()
 			for author in muting_originalPostAuthors:
 				if author not in muting_authors:
@@ -1084,7 +1084,6 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 	except:
 		logging.debug(sys.exc_info())
 		traceback.print_tb(sys.exc_info()[2])
-		traceback.print_stack()
 
 		res['code'] = msg_code['UNKNOWN_ERROR']
 		
