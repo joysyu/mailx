@@ -1046,11 +1046,11 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 			 		muted_emails.append(m.user.email)
 
 		    # prevent the user from receving any follow up if the author or the reply or of the og post is muted.
-			#if len(muting_authors)> 0:
-		#		if not Muting.objects.filter(user=user, thread=thread).exists(): 
-			#		if user:
-			#			m = Muting(user=user, thread=thread)
-			#			m.save()
+			if len(muting_authors)> 0:
+				if not Mute.objects.filter(user=user, thread=thread).exists(): 
+					if user:
+						m = Mute(user=user, thread=thread)
+						m.save()
 
 			# # Users who follow the author of the original post will always receive replies.
 			#following_authors = FollowUserGroup.objects.filter(group = group, following = post.author).select_related()
