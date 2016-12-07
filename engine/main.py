@@ -1084,6 +1084,7 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 	except:
 		logging.debug(sys.exc_info())
 		traceback.print_tb(sys.exc_info()[2])
+		traceback.print_stack()
 
 		res['code'] = msg_code['UNKNOWN_ERROR']
 		
