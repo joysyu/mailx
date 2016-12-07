@@ -1,4 +1,4 @@
-import sys, logging, base64, email, datetime
+import sys, logging, base64, email, datetime, traceback
 from schema.models import *
 from constants import *
 from django.utils.timezone import utc
@@ -1061,6 +1061,7 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 			#users that always follow threads in this group. minus those that muted
 			recipients.extend([m.member.email for m in member_recip if m.member.email not in muted_emails])
 			
+
 			res['status'] = True
 			res['recipients'] = list(set(recipients))
 			res['tags'] = list(tag_objs.values('name'))
@@ -1080,6 +1081,8 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 
 	except:
 		logging.debug(sys.exc_info())
+		traceback.print_tb(sys.exc_info()[2])
+
 		res['code'] = msg_code['UNKNOWN_ERROR']
 		
 	logging.debug(res)
