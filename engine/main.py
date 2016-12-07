@@ -1036,7 +1036,10 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 
 			# # muting_authors is all the emails of users who are muting either author or reply or author of original post.
 			muting_authors = MuteUserGroup.objects.filter(group = group, muting = user).select_related()
-			#muting_authors.extend(MuteUserGroup.objects.filter(group = group, muting = post.author).select_related())
+			muting_originalPostAuthors = MuteUserGroup.objects.filter(group = group, muting = post.author).select_related()
+			for author in muting_originalPostAuthors:
+				if author not in muting_authors:
+					muting_authors.append(author)
 
 			# for m in muting_authors:
 			# 	if m.user.email in always_follow_members and m.user.email not in muted_emails:
