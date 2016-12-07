@@ -1039,6 +1039,8 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 			muting_originalPostAuthors = MuteUserGroup.objects.filter(group = group, muting = post.author).select_related()
 			for author in muting_originalPostAuthors:
 				if author not in muting_authors:
+					logging.debug(muting_authors)
+					logging.debug(author)
 					muting_authors.append(author)
 
 			for m in muting_authors:
