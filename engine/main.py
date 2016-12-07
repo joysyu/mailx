@@ -1041,22 +1041,22 @@ def insert_reply(group_name, subject, message_text, user, sender_addr, forwardin
 				if author not in muting_authors:
 					muting_authors.append(author)
 
-			# for m in muting_authors:
-			# 	if m.user.email in always_follow_members and m.user.email not in muted_emails:
-			# 		muted_emails.append(m.user.email)
+			for m in muting_authors:
+			 	if m.user.email in always_follow_members and m.user.email not in muted_emails:
+			 		muted_emails.append(m.user.email)
 
-		 #    # prevent the user from receving any follow up if the author or the reply or of the og post is muted.
-			# if len(muting_authors)> 0:
-			# 	if not Muting.objects.filter(user=user, thread=thread).exists(): 
-			# 		if user:
-			# 			m = Muting(user=user, thread=thread)
-			# 			m.save()
+		    # prevent the user from receving any follow up if the author or the reply or of the og post is muted.
+			if len(muting_authors)> 0:
+				if not Muting.objects.filter(user=user, thread=thread).exists(): 
+					if user:
+						m = Muting(user=user, thread=thread)
+						m.save()
 
 			# # Users who follow the author of the original post will always receive replies.
-			# following_authors = FollowUserGroup.objects.filter(group = group, following = post.author).select_related()
-			# for f in following_authors:
-			# 	if f.user.email not in always_follow_members and f.user.email not in recipients:
-			# 		recipients.append(f.user.email)
+			following_authors = FollowUserGroup.objects.filter(group = group, following = post.author).select_related()
+			for f in following_authors:
+				if f.user.email not in always_follow_members and f.user.email not in recipients:
+					recipients.append(f.user.email)
 
 			#users that always follow threads in this group. minus those that muted
 			recipients.extend([m.member.email for m in member_recip if m.member.email not in muted_emails])
